@@ -45,12 +45,19 @@ jobs:
       - name: Compile and Link WiX Installer (MSI)
         run: |
           cd Setup
-          $wixBin = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
-          if (-not (Test-Path (Join-Path $wixBin "candle.exe"))) {
-            $wixBin = "C:\Program Files\WiX Toolset v3.11\bin"
+          $wixCandidates = @(
+            "C:\Program Files (x86)\WiX Toolset v3.11\bin",
+            "C:\Program Files\WiX Toolset v3.11\bin",
+            "$env:ChocolateyInstall\lib\wixtoolset\tools",
+            "$env:ChocolateyInstall\bin"
+          )
+          $wixBin = $wixCandidates | Where-Object { Test-Path (Join-Path $_ "candle.exe") } | Select-Object -First 1
+          if (-not $wixBin) {
+            $found = Get-ChildItem "C:\Program Files", "C:\Program Files (x86)", "$env:ChocolateyInstall" -Filter candle.exe -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($found) { $wixBin = $found.DirectoryName }
           }
-          if (-not (Test-Path (Join-Path $wixBin "candle.exe"))) {
-            throw "WiX Toolset v3.11 not found."
+          if (-not $wixBin) {
+            throw "WiX Toolset not found (candle.exe missing)."
           }
           & (Join-Path $wixBin "candle.exe") Setup.wxs -o Setup.wixobj
           & (Join-Path $wixBin "light.exe") Setup.wixobj -out PhishingReporterSetup.msi
