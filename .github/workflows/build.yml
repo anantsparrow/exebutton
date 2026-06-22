@@ -51,16 +51,25 @@ jobs:
             "$env:ChocolateyInstall\lib\wixtoolset\tools",
             "$env:ChocolateyInstall\bin"
           )
-          $wixBin = $wixCandidates | Where-Object { Test-Path (Join-Path $_ "candle.exe") } | Select-Object -First 1
+          $wixBin = $wixCandidates | Where-Object {
+            (Test-Path (Join-Path $_ "candle.exe")) -and (Test-Path (Join-Path $_ "light.exe"))
+          } | Select-Object -First 1
           if (-not $wixBin) {
-            $found = Get-ChildItem "C:\Program Files", "C:\Program Files (x86)", "$env:ChocolateyInstall" -Filter candle.exe -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            $roots = @("C:\Program Files", "C:\Program Files (x86)", "$env:ChocolateyInstall") | Where-Object { Test-Path $_ }
+            $found = Get-ChildItem $roots -Filter candle.exe -File -Recurse -ErrorAction SilentlyContinue | Where-Object {
+              Test-Path (Join-Path $_.DirectoryName "light.exe")
+            } | Select-Object -First 1
             if ($found) { $wixBin = $found.DirectoryName }
           }
           if (-not $wixBin) {
             throw "WiX Toolset not found (candle.exe missing)."
           }
+          Write-Host "Using WiX bin: $wixBin"
           & (Join-Path $wixBin "candle.exe") Setup.wxs -o Setup.wixobj
           & (Join-Path $wixBin "light.exe") Setup.wixobj -out PhishingReporterSetup.msi
+          if (-not (Test-Path "PhishingReporterSetup.msi")) {
+            throw "MSI was not generated."
+          }
         shell: pwsh
 
       - name: Upload MSI Installer Artifact
