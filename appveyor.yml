@@ -13,7 +13,7 @@ before_build:
   - cmd: certutil -user -p "" -importpfx "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx" NoRoot
 
 build_script:
-  - msbuild "PhishingReporterAddIn\PhishingReporterAddIn.csproj" /p:Configuration=Release /p:Platform=AnyCPU /p:ManifestCertificateThumbprint=%ManifestCertificateThumbprint% /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - msbuild "PhishingReporterAddIn\PhishingReporterAddIn.csproj" /p:Configuration=Release /p:ManifestCertificateThumbprint=%ManifestCertificateThumbprint% /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 after_build:
   - ps: |

@@ -31,7 +31,7 @@ jobs:
         shell: pwsh
 
       - name: Build Outlook Add-In (Release Configuration)
-        run: msbuild PhishingReporterAddIn/PhishingReporterAddIn.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:ManifestCertificateThumbprint=${{ steps.cert.outputs.thumbprint }}
+        run: msbuild PhishingReporterAddIn/PhishingReporterAddIn.csproj /p:Configuration=Release /p:ManifestCertificateThumbprint=${{ steps.cert.outputs.thumbprint }}
 
       - name: Compile and Link WiX Installer (MSI)
         run: |
