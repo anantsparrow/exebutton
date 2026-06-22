@@ -4,6 +4,8 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <!-- AppVeyor may provide "Any CPU"; normalize to the project's "AnyCPU" platform name. -->
+    <Platform Condition=" '$(Platform)' == 'Any CPU' ">AnyCPU</Platform>
     <ProjectGuid>{4EA7A1B1-3E2A-4B6A-91C7-498A60FB4FA8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
