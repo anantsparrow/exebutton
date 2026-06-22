@@ -18,6 +18,15 @@ jobs:
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
 
+      - name: Ensure WiX Toolset v3.11
+        run: |
+          $wixBin86 = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          $wixBin64 = "C:\Program Files\WiX Toolset v3.11\bin"
+          if (-not (Test-Path (Join-Path $wixBin86 "candle.exe")) -and -not (Test-Path (Join-Path $wixBin64 "candle.exe"))) {
+            choco install wixtoolset --version=3.11.2 -y --no-progress
+          }
+        shell: pwsh
+
       - name: Import Code Signing Certificate
         run: certutil -user -p "" -importpfx "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx" NoRoot
         shell: cmd

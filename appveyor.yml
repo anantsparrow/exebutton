@@ -6,6 +6,12 @@ configuration: Release
 
 before_build:
   - ps: |
+      $wixBin86 = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
+      $wixBin64 = "C:\Program Files\WiX Toolset v3.11\bin"
+      if (-not (Test-Path (Join-Path $wixBin86 "candle.exe")) -and -not (Test-Path (Join-Path $wixBin64 "candle.exe"))) {
+        choco install wixtoolset --version=3.11.2 -y --no-progress
+      }
+  - ps: |
       $certPath = Join-Path $env:APPVEYOR_BUILD_FOLDER "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx"
       $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath, "")
       $env:ManifestCertificateThumbprint = $cert.Thumbprint
