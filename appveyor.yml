@@ -1,0 +1,18 @@
+version: 1.0.{build}
+image: Visual Studio 2022
+
+platform: Any CPU
+configuration: Release
+
+build:
+  project: PhishingReporterAddIn/PhishingReporterAddIn.csproj
+  verbosity: normal
+
+after_build:
+  - cd Setup
+  - '"C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" Setup.wxs -o Setup.wixobj'
+  - '"C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" Setup.wixobj -out PhishingReporterSetup.msi'
+
+artifacts:
+  - path: Setup/PhishingReporterSetup.msi
+    name: PhishingReporterSetup
