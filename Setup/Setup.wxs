@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" 
+           Name="Outlook Phishing Reporter Add-in" 
+           Language="1033" 
+           Version="1.0.0.0" 
+           Manufacturer="Phishing Triage" 
+           UpgradeCode="7f6e4e2c-a893-4b9f-84d2-7e9abdf9192c">
+    
+    <Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Description="Installs the Outlook Phishing Reporter Add-in and configures default settings." />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Directory structure -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <!-- Program Files Folder -->
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="ManufacturerDir" Name="Phishing Triage">
+          <Directory Id="INSTALLDIR" Name="Phishing Reporter">
+            
+            <!-- VSTO files component -->
+            <Component Id="AddInFiles" Guid="41c7b81c-d784-4861-bf99-28c0490b43f9">
+              <File Id="AddInDll" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.dll" KeyPath="yes" />
+              <File Id="AddInManifest" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.vsto" />
+              <File Id="AddInDllManifest" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.dll.manifest" />
+            </Component>
+
+            <!-- Registry keys for Outlook Add-in Registration -->
+            <Component Id="RegistryEntries" Guid="c37c229e-219e-4e4b-9e48-8df0df86c758">
+              <!-- Regular registration (64-bit Office, or 32-bit on 32-bit OS) -->
+              <RegistryKey Root="HKLM" Key="Software\Microsoft\Office\Outlook\Addins\PhishingReporter">
+                <RegistryValue Type="string" Name="FriendlyName" Value="Report Phishing" />
+                <RegistryValue Type="string" Name="Description" Value="Report suspicious emails to the security team." />
+                <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
+                <RegistryValue Type="string" Name="Manifest" Value="[INSTALLDIR]PhishingReporterAddIn.vsto|vstolocal" />
+                <RegistryValue Type="integer" Name="CommandLineSafe" Value="0" />
+              </RegistryKey>
+              
+              <!-- Wow6432Node registration (32-bit Office on 64-bit OS) -->
+              <RegistryKey Root="HKLM" Key="Software\Wow6432Node\Microsoft\Office\Outlook\Addins\PhishingReporter">
+                <RegistryValue Type="string" Name="FriendlyName" Value="Report Phishing" />
+                <RegistryValue Type="string" Name="Description" Value="Report suspicious emails to the security team." />
+                <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
+                <RegistryValue Type="string" Name="Manifest" Value="[INSTALLDIR]PhishingReporterAddIn.vsto|vstolocal" />
+                <RegistryValue Type="integer" Name="CommandLineSafe" Value="0" />
+              </RegistryKey>
+            </Component>
+            
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <!-- ProgramData Folder -->
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="ProgramDataPhishingReporter" Name="PhishingReporter">
+          <Component Id="ConfigComponent" Guid="e63b4c5f-f4d6-4a59-a8f8-23e9b7d7e623">
+            <CreateFolder />
+            <File Id="DefaultConfigJson" Source="config.json" KeyPath="yes" />
+            <RemoveFile Id="RemoveConfigJson" Name="config.json" On="uninstall" />
+            <RemoveFolder Id="RemoveConfigFolder" On="uninstall" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="Outlook Phishing Reporter" Level="1">
+      <ComponentRef Id="AddInFiles" />
+      <ComponentRef Id="RegistryEntries" />
+      <ComponentRef Id="ConfigComponent" />
+    </Feature>
+  </Product>
+</Wix>

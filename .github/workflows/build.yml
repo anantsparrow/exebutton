@@ -1,0 +1,38 @@
+name: Build VSTO Add-in and MSI Installer
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Allows manual trigger from the GitHub Web UI
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Build Outlook Add-In (Release Configuration)
+      run: |
+        msbuild PhishingReporterAddIn\PhishingReporterAddIn.csproj /p:Configuration=Release /p:Platform="Any CPU"
+
+    - name: Compile and Link WiX Installer (MSI)
+      run: |
+        cd Setup
+        # GitHub Windows-latest runner has WiX pre-installed.
+        # We invoke the compilers directly from their default installation path.
+        & "C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" Setup.wxs -o Setup.wixobj
+        & "C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" Setup.wixobj -out PhishingReporterSetup.msi
+      shell: pwsh
+
+    - name: Upload MSI Installer Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: PhishingReporterSetup
+        path: Setup\PhishingReporterSetup.msi

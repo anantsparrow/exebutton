@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load" loadImage="GetImage">
+  <ribbon>
+    <tabs>
+      <!-- Outlook Explorer ribbon tab (when browsing mail folders) -->
+      <tab idMso="TabMail">
+        <group id="groupPhishingExplorer" label="Phishing Triage" insertBeforeMso="GroupMailDelete">
+          <button id="btnReportPhishingExplorer"
+                  label="Report Phishing"
+                  size="large"
+                  onAction="OnReportPhishing"
+                  image="phish_logo"
+                  screentip="Report suspicious email"
+                  supertip="Report this email to the security team for phishing analysis." />
+        </group>
+      </tab>
+      <!-- Outlook Inspector ribbon tab (when double-clicking and reading an email) -->
+      <tab idMso="TabReadMessage">
+        <group id="groupPhishingInspector" label="Phishing Triage" insertBeforeMso="GroupMailDelete">
+          <button id="btnReportPhishingInspector"
+                  label="Report Phishing"
+                  size="large"
+                  onAction="OnReportPhishing"
+                  image="phish_logo"
+                  screentip="Report suspicious email"
+                  supertip="Report this email to the security team for phishing analysis." />
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>
