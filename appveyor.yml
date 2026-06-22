@@ -4,6 +4,9 @@ image: Visual Studio 2022
 platform: Any CPU
 configuration: Release
 
+before_build:
+  - cmd: certutil -user -p "" -importpfx "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx" NoRoot
+
 build:
   project: PhishingReporterAddIn/PhishingReporterAddIn.csproj
   verbosity: normal

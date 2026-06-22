@@ -18,6 +18,10 @@ jobs:
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
 
+      - name: Import Code Signing Certificate
+        run: certutil -user -p "" -importpfx "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx" NoRoot
+        shell: cmd
+
       - name: Build Outlook Add-In (Release Configuration)
         run: msbuild PhishingReporterAddIn/PhishingReporterAddIn.csproj /p:Configuration=Release /p:Platform="Any CPU"
 

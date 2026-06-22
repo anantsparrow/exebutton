@@ -54,7 +54,8 @@
   </PropertyGroup>
   <!-- VSTO project settings -->
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
+    <ManifestKeyFile>PhishingReporterAddIn_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <!-- Project Type Guids for C# Outlook VSTO Add-In -->
   <PropertyGroup>
