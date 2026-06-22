@@ -57,6 +57,10 @@
     <SignManifests>true</SignManifests>
     <ManifestKeyFile>PhishingReporterAddIn_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
+  <!-- AppVeyor CI does not provide a certificate thumbprint for ManageCertificateStore. -->
+  <PropertyGroup Condition="'$(APPVEYOR)' == 'True' Or '$(APPVEYOR)' == 'true'">
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
   <!-- Project Type Guids for C# Outlook VSTO Add-In -->
   <PropertyGroup>
     <ProjectTypeGuids>{BAA0C2D2-18E2-41B9-852F-F413020CAA33};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
