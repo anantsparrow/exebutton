@@ -8,6 +8,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace PhishingReporterAddIn
 {
+    [global::Microsoft.VisualStudio.Tools.Applications.Runtime.StartupObjectAttribute()]
     public partial class ThisAddIn
     {
         public static ThisAddIn Instance { get; private set; }
