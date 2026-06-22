@@ -5,16 +5,30 @@ platform: Any CPU
 configuration: Release
 
 before_build:
+  - ps: |
+      $certPath = Join-Path $env:APPVEYOR_BUILD_FOLDER "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx"
+      $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath, "")
+      $env:ManifestCertificateThumbprint = $cert.Thumbprint
+      Write-Host "Using manifest thumbprint: $($env:ManifestCertificateThumbprint)"
   - cmd: certutil -user -p "" -importpfx "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx" NoRoot
 
-build:
-  project: PhishingReporterAddIn/PhishingReporterAddIn.csproj
-  verbosity: normal
+build_script:
+  - msbuild "PhishingReporterAddIn\PhishingReporterAddIn.csproj" /p:Configuration=Release /p:Platform=AnyCPU /p:ManifestCertificateThumbprint=%ManifestCertificateThumbprint% /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 after_build:
-  - cd Setup
-  - '"C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" Setup.wxs -o Setup.wixobj'
-  - '"C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" Setup.wixobj -out PhishingReporterSetup.msi'
+  - ps: |
+      Set-Location Setup
+      $wixBin = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
+      if (-not (Test-Path (Join-Path $wixBin "candle.exe"))) {
+        $wixBin = "C:\Program Files\WiX Toolset v3.11\bin"
+      }
+      if (-not (Test-Path (Join-Path $wixBin "candle.exe"))) {
+        throw "WiX Toolset v3.11 not found."
+      }
+      & (Join-Path $wixBin "candle.exe") Setup.wxs -o Setup.wixobj
+      if ($LASTEXITCODE -ne 0) { throw "WiX candle.exe failed with code $LASTEXITCODE." }
+      & (Join-Path $wixBin "light.exe") Setup.wixobj -out PhishingReporterSetup.msi
+      if ($LASTEXITCODE -ne 0) { throw "WiX light.exe failed with code $LASTEXITCODE." }
 
 artifacts:
   - path: Setup/PhishingReporterSetup.msi

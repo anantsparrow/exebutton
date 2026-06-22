@@ -22,14 +22,29 @@ jobs:
         run: certutil -user -p "" -importpfx "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx" NoRoot
         shell: cmd
 
+      - name: Resolve Manifest Thumbprint
+        id: cert
+        run: |
+          $certPath = Join-Path $env:GITHUB_WORKSPACE "PhishingReporterAddIn\PhishingReporterAddIn_TemporaryKey.pfx"
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath, "")
+          "thumbprint=$($cert.Thumbprint)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        shell: pwsh
+
       - name: Build Outlook Add-In (Release Configuration)
-        run: msbuild PhishingReporterAddIn/PhishingReporterAddIn.csproj /p:Configuration=Release /p:Platform="Any CPU"
+        run: msbuild PhishingReporterAddIn/PhishingReporterAddIn.csproj /p:Configuration=Release /p:Platform=AnyCPU /p:ManifestCertificateThumbprint=${{ steps.cert.outputs.thumbprint }}
 
       - name: Compile and Link WiX Installer (MSI)
         run: |
           cd Setup
-          & "C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" Setup.wxs -o Setup.wixobj
-          & "C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" Setup.wixobj -out PhishingReporterSetup.msi
+          $wixBin = "C:\Program Files (x86)\WiX Toolset v3.11\bin"
+          if (-not (Test-Path (Join-Path $wixBin "candle.exe"))) {
+            $wixBin = "C:\Program Files\WiX Toolset v3.11\bin"
+          }
+          if (-not (Test-Path (Join-Path $wixBin "candle.exe"))) {
+            throw "WiX Toolset v3.11 not found."
+          }
+          & (Join-Path $wixBin "candle.exe") Setup.wxs -o Setup.wixobj
+          & (Join-Path $wixBin "light.exe") Setup.wixobj -out PhishingReporterSetup.msi
         shell: pwsh
 
       - name: Upload MSI Installer Artifact
