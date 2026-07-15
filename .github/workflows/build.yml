@@ -66,7 +66,7 @@ jobs:
           }
           Write-Host "Using WiX bin: $wixBin"
           & (Join-Path $wixBin "candle.exe") Setup.wxs -o Setup.wixobj
-          & (Join-Path $wixBin "light.exe") Setup.wixobj -out PhishingReporterSetup.msi
+          & (Join-Path $wixBin "light.exe") -ext WixUIExtension Setup.wixobj -out PhishingReporterSetup.msi
           if (-not (Test-Path "PhishingReporterSetup.msi")) {
             throw "MSI was not generated."
           }

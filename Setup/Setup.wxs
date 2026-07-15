@@ -28,6 +28,7 @@
               <File Id="AddInDll" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.dll" KeyPath="yes" />
               <File Id="AddInManifest" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.vsto" />
               <File Id="AddInDllManifest" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.dll.manifest" />
+              <File Id="CertFile" Source="cert.cer" />
             </Component>
 
             <!-- Registry keys for Outlook Add-in Registration -->
@@ -74,5 +75,20 @@
       <ComponentRef Id="RegistryEntries" />
       <ComponentRef Id="ConfigComponent" />
     </Feature>
+
+    <!-- Custom Action to trust certificate -->
+    <CustomAction Id="InstallCertificate" Directory="INSTALLDIR" Execute="deferred" Impersonate="no"
+                  ExeCommand='cmd.exe /c certutil.exe -addstore "TrustedPublisher" "[INSTALLDIR]cert.cer"' Return="ignore" />
+
+    <InstallExecuteSequence>
+      <Custom Action="InstallCertificate" Before="InstallFinalize">NOT Installed</Custom>
+    </InstallExecuteSequence>
+
+    <!-- UI -->
+    <UI>
+      <UIRef Id="WixUI_Minimal" />
+    </UI>
+    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+
   </Product>
 </Wix>
