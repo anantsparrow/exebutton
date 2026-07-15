@@ -10,6 +10,7 @@
     <Package InstallerVersion="200" 
              Compressed="yes" 
              InstallScope="perMachine" 
+             Platform="x64"
              Description="Installs the Outlook Phishing Reporter Add-in and configures default settings." />
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -19,12 +20,12 @@
     <!-- Directory structure -->
     <Directory Id="TARGETDIR" Name="SourceDir">
       <!-- Program Files Folder -->
-      <Directory Id="ProgramFilesFolder">
+      <Directory Id="ProgramFiles64Folder">
         <Directory Id="ManufacturerDir" Name="Phishing Triage">
           <Directory Id="INSTALLDIR" Name="Phishing Reporter">
             
             <!-- VSTO files component -->
-            <Component Id="AddInFiles" Guid="41c7b81c-d784-4861-bf99-28c0490b43f9">
+            <Component Id="AddInFiles" Guid="41c7b81c-d784-4861-bf99-28c0490b43f9" Win64="yes">
               <File Id="AddInDll" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.dll" KeyPath="yes" />
               <File Id="AddInManifest" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.vsto" />
               <File Id="AddInDllManifest" Source="..\PhishingReporterAddIn\bin\Release\PhishingReporterAddIn.dll.manifest" />
@@ -32,7 +33,7 @@
             </Component>
 
             <!-- Registry keys for Outlook Add-in Registration -->
-            <Component Id="RegistryEntries" Guid="c37c229e-219e-4e4b-9e48-8df0df86c758">
+            <Component Id="RegistryEntries" Guid="c37c229e-219e-4e4b-9e48-8df0df86c758" Win64="yes">
               <!-- Regular registration (64-bit Office, or 32-bit on 32-bit OS) -->
               <RegistryKey Root="HKLM" Key="Software\Microsoft\Office\Outlook\Addins\PhishingReporter">
                 <RegistryValue Type="string" Name="FriendlyName" Value="Report Phishing" />
@@ -59,7 +60,7 @@
       <!-- ProgramData Folder -->
       <Directory Id="CommonAppDataFolder">
         <Directory Id="ProgramDataPhishingReporter" Name="PhishingReporter">
-          <Component Id="ConfigComponent" Guid="e63b4c5f-f4d6-4a59-a8f8-23e9b7d7e623">
+          <Component Id="ConfigComponent" Guid="e63b4c5f-f4d6-4a59-a8f8-23e9b7d7e623" Win64="yes">
             <CreateFolder />
             <File Id="DefaultConfigJson" Source="config.json" KeyPath="yes" />
             <RemoveFile Id="RemoveConfigJson" Name="config.json" On="uninstall" />

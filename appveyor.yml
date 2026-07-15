@@ -42,7 +42,7 @@ after_build:
       }
       if (-not $wixBin) { throw "WiX Toolset not found (candle.exe missing)." }
       Write-Host "Using WiX bin: $wixBin"
-      & (Join-Path $wixBin "candle.exe") Setup.wxs -o Setup.wixobj
+      & (Join-Path $wixBin "candle.exe") -arch x64 Setup.wxs -o Setup.wixobj
       if ($LASTEXITCODE -ne 0) { throw "WiX candle.exe failed with code $LASTEXITCODE." }
       & (Join-Path $wixBin "light.exe") -ext WixUIExtension Setup.wixobj -out PhishingReporterSetup.msi
       if ($LASTEXITCODE -ne 0) { throw "WiX light.exe failed with code $LASTEXITCODE." }
