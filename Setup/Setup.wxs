@@ -77,11 +77,14 @@
     </Feature>
 
     <!-- Custom Action to trust certificate -->
-    <CustomAction Id="InstallCertificate" Directory="INSTALLDIR" Execute="deferred" Impersonate="no"
+    <CustomAction Id="InstallCertificateRoot" Directory="INSTALLDIR" Execute="deferred" Impersonate="no"
+                  ExeCommand='cmd.exe /c certutil.exe -addstore "Root" "[INSTALLDIR]cert.cer"' Return="ignore" />
+    <CustomAction Id="InstallCertificatePublisher" Directory="INSTALLDIR" Execute="deferred" Impersonate="no"
                   ExeCommand='cmd.exe /c certutil.exe -addstore "TrustedPublisher" "[INSTALLDIR]cert.cer"' Return="ignore" />
 
     <InstallExecuteSequence>
-      <Custom Action="InstallCertificate" Before="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="InstallCertificateRoot" Before="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="InstallCertificatePublisher" After="InstallCertificateRoot">NOT Installed</Custom>
     </InstallExecuteSequence>
 
     <!-- UI -->
