@@ -32,7 +32,7 @@ namespace PhishingReporterAddIn
                 {
                     var defaultConfig = new PhishingConfig
                     {
-                        ApiUrl = "https://webhook.site/e0cc9551-e7d5-4704-b0c2-ef4874a502d8",
+                        ApiUrl = "https://webhook.site/0e700239-5671-4998-9732-c674daba382f",
                         TimeoutSeconds = 30
                     };
                     Save(defaultConfig);
@@ -54,7 +54,7 @@ namespace PhishingReporterAddIn
                 // Return default fallback configuration
                 return new PhishingConfig
                 {
-                    ApiUrl = "https://webhook.site/e0cc9551-e7d5-4704-b0c2-ef4874a502d8",
+                    ApiUrl = "https://webhook.site/0e700239-5671-4998-9732-c674daba382f",
                     TimeoutSeconds = 30
                 };
             }
