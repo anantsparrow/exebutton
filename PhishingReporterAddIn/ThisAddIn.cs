@@ -258,63 +258,65 @@ namespace PhishingReporterAddIn
         private async Task<bool> UploadReportAsync(string apiUrl, string subject, string sender, string fromAddress, List<string> toList, string dateStr, string headers, string body, string msgPath, List<string> attachmentPaths, int timeoutSeconds)
         {
             // Force TLS 1.2/1.3 — required for modern HTTPS endpoints (webhook.site, etc.)
-            // .NET 4.x under Outlook defaults to TLS 1.0 which many servers reject
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
+            
+            var payload = new Dictionary<string, object>
+            {
+                { "subject", subject },
+                { "sender", sender },
+                { "from", fromAddress },
+                { "to", toList },
+                { "date", dateStr },
+                { "headers", headers },
+                { "body", body }
+            };
+
+            if (File.Exists(msgPath))
+            {
+                try
+                {
+                    payload.Add("email_msg_filename", Path.GetFileName(msgPath));
+                    payload.Add("email_msg_base64", Convert.ToBase64String(File.ReadAllBytes(msgPath)));
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Failed to encode MSG: " + ex.Message);
+                }
+            }
+
+            var attList = new List<Dictionary<string, string>>();
+            foreach (var attPath in attachmentPaths)
+            {
+                if (File.Exists(attPath))
+                {
+                    try
+                    {
+                        var attData = new Dictionary<string, string>
+                        {
+                            { "filename", Path.GetFileName(attPath) },
+                            { "content_base64", Convert.ToBase64String(File.ReadAllBytes(attPath)) }
+                        };
+                        attList.Add(attData);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Failed to encode attachment: " + ex.Message);
+                    }
+                }
+            }
+            payload.Add("attachments", attList);
+
+            var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            serializer.MaxJsonLength = int.MaxValue;
+            string jsonPayload = serializer.Serialize(payload);
+
             using (var client = new HttpClient())
             {
                 client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
-                using (var content = new MultipartFormDataContent())
+                using (var content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json"))
                 {
-                    // Add text fields
-                    content.Add(new StringContent(subject), "subject");
-                    content.Add(new StringContent(sender), "sender");
-                    content.Add(new StringContent(fromAddress), "from");
-                    
-                    foreach (var to in toList)
-                    {
-                        content.Add(new StringContent(to), "to[]");
-                    }
-                    content.Add(new StringContent(dateStr), "date");
-                    content.Add(new StringContent(headers), "headers");
-                    content.Add(new StringContent(body), "body");
-
-                    var openStreams = new List<Stream>();
-                    try
-                    {
-                        // Add MSG file stream
-                        if (File.Exists(msgPath))
-                        {
-                            var msgStream = File.OpenRead(msgPath);
-                            openStreams.Add(msgStream);
-                            var fileContent = new StreamContent(msgStream);
-                            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-                            content.Add(fileContent, "email_msg", Path.GetFileName(msgPath));
-                        }
-
-                        // Add attachment streams
-                        foreach (var attPath in attachmentPaths)
-                        {
-                            if (File.Exists(attPath))
-                            {
-                                var attStream = File.OpenRead(attPath);
-                                openStreams.Add(attStream);
-                                var attContent = new StreamContent(attStream);
-                                attContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-                                content.Add(attContent, "attachments[]", Path.GetFileName(attPath));
-                            }
-                        }
-
-                        var response = await client.PostAsync(apiUrl, content);
-                        return response.IsSuccessStatusCode;
-                    }
-                    finally
-                    {
-                        // Clean up file handle locks
-                        foreach (var stream in openStreams)
-                        {
-                            try { stream.Dispose(); } catch {}
-                        }
-                    }
+                    var response = await client.PostAsync(apiUrl, content);
+                    return response.IsSuccessStatusCode;
                 }
             }
         }
