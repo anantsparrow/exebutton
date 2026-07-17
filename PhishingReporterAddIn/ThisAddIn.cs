@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -256,6 +257,9 @@ namespace PhishingReporterAddIn
 
         private async Task<bool> UploadReportAsync(string apiUrl, string subject, string sender, string fromAddress, List<string> toList, string dateStr, string headers, string body, string msgPath, List<string> attachmentPaths, int timeoutSeconds)
         {
+            // Force TLS 1.2/1.3 — required for modern HTTPS endpoints (webhook.site, etc.)
+            // .NET 4.x under Outlook defaults to TLS 1.0 which many servers reject
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
             using (var client = new HttpClient())
             {
                 client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
