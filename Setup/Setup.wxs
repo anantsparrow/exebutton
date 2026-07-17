@@ -39,7 +39,7 @@
                 <RegistryValue Type="string" Name="FriendlyName" Value="Report Phishing" />
                 <RegistryValue Type="string" Name="Description" Value="Report suspicious emails to the security team." />
                 <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
-                <RegistryValue Type="string" Name="Manifest" Value="[INSTALLDIR]PhishingReporterAddIn.vsto|vstolocal" />
+                <RegistryValue Type="string" Name="Manifest" Value="file:///[INSTALLDIR]PhishingReporterAddIn.vsto|vstolocal" />
                 <RegistryValue Type="integer" Name="CommandLineSafe" Value="0" />
               </RegistryKey>
               
@@ -48,7 +48,7 @@
                 <RegistryValue Type="string" Name="FriendlyName" Value="Report Phishing" />
                 <RegistryValue Type="string" Name="Description" Value="Report suspicious emails to the security team." />
                 <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
-                <RegistryValue Type="string" Name="Manifest" Value="[INSTALLDIR]PhishingReporterAddIn.vsto|vstolocal" />
+                <RegistryValue Type="string" Name="Manifest" Value="file:///[INSTALLDIR]PhishingReporterAddIn.vsto|vstolocal" />
                 <RegistryValue Type="integer" Name="CommandLineSafe" Value="0" />
               </RegistryKey>
             </Component>
