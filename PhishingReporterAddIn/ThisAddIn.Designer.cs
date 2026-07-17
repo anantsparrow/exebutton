@@ -9,6 +9,7 @@ namespace PhishingReporterAddIn
         public ThisAddIn(global::Microsoft.Office.Tools.Outlook.Factory factory, global::System.IServiceProvider serviceProvider) 
             : base(factory, serviceProvider, "AddIn", "ThisAddIn")
         {
+            Instance = this;
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

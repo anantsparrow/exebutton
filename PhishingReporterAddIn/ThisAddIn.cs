@@ -14,14 +14,9 @@ namespace PhishingReporterAddIn
         public static ThisAddIn Instance { get; private set; }
         private System.Threading.SynchronizationContext _uiSyncContext;
 
-        protected override void Initialize()
-        {
-            Instance = this;
-            base.Initialize();
-        }
-
         private void ThisAddIn_Startup(object sender, EventArgs e)
         {
+            Instance = this;
             _uiSyncContext = System.Threading.SynchronizationContext.Current;
             // Pre-load or initialize configuration on startup to ensure folder structure exists
             ConfigManager.Load();
