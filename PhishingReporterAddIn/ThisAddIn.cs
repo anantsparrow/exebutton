@@ -135,12 +135,36 @@ namespace PhishingReporterAddIn
                 var attachmentPaths = new List<string>();
                 if (mailItem.Attachments != null && mailItem.Attachments.Count > 0)
                 {
+                    int attIndex = 1;
                     foreach (Outlook.Attachment attachment in mailItem.Attachments)
                     {
-                        string safeFileName = MakeValidFileName(attachment.FileName);
+                        string originalName = attachment.FileName;
+                        if (string.IsNullOrEmpty(originalName))
+                        {
+                            originalName = "attachment_" + attIndex;
+                        }
+                        
+                        string safeFileName = MakeValidFileName(originalName);
+                        if (string.IsNullOrEmpty(safeFileName))
+                        {
+                            safeFileName = "attachment_" + attIndex;
+                        }
+                        
                         string fullPath = Path.Combine(tempDir, safeFileName);
+                        
+                        // Handle potential name collisions (e.g., duplicate attachment names)
+                        int collisionCounter = 1;
+                        while (File.Exists(fullPath))
+                        {
+                            string filenameNoExt = Path.GetFileNameWithoutExtension(safeFileName);
+                            string ext = Path.GetExtension(safeFileName);
+                            fullPath = Path.Combine(tempDir, $"{filenameNoExt}_{collisionCounter}{ext}");
+                            collisionCounter++;
+                        }
+                        
                         attachment.SaveAsFile(fullPath);
                         attachmentPaths.Add(fullPath);
+                        attIndex++;
                     }
                 }
 
@@ -250,19 +274,20 @@ namespace PhishingReporterAddIn
                     content.Add(new StringContent(headers), "headers");
                     content.Add(new StringContent(body), "body");
 
-                    // Add MSG file stream
-                    if (File.Exists(msgPath))
-                    {
-                        var msgStream = File.OpenRead(msgPath);
-                        var fileContent = new StreamContent(msgStream);
-                        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-                        content.Add(fileContent, "email_msg", Path.GetFileName(msgPath));
-                    }
-
-                    // Add attachment streams
                     var openStreams = new List<Stream>();
                     try
                     {
+                        // Add MSG file stream
+                        if (File.Exists(msgPath))
+                        {
+                            var msgStream = File.OpenRead(msgPath);
+                            openStreams.Add(msgStream);
+                            var fileContent = new StreamContent(msgStream);
+                            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+                            content.Add(fileContent, "email_msg", Path.GetFileName(msgPath));
+                        }
+
+                        // Add attachment streams
                         foreach (var attPath in attachmentPaths)
                         {
                             if (File.Exists(attPath))
