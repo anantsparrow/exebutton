@@ -32,7 +32,7 @@ namespace PhishingReporterAddIn
                 {
                     var defaultConfig = new PhishingConfig
                     {
-                        ApiUrl = "https://webhook.site/0e700239-5671-4998-9732-c674daba382f",
+                        ApiUrl = "https://testing.simuphish.com/phish-triage/log-report",
                         TimeoutSeconds = 30
                     };
                     Save(defaultConfig);
@@ -54,7 +54,7 @@ namespace PhishingReporterAddIn
                 // Return default fallback configuration
                 return new PhishingConfig
                 {
-                    ApiUrl = "https://webhook.site/0e700239-5671-4998-9732-c674daba382f",
+                    ApiUrl = "https://testing.simuphish.com/phish-triage/log-report",
                     TimeoutSeconds = 30
                 };
             }
